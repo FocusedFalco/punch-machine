@@ -97,6 +97,14 @@ export function AdminScreen({ session, onLogout }: { session: SessionData; onLog
         return next;
       });
     });
+    ws.on("team_removed", (msg) => {
+      setTeams((prev) => {
+        const next = new Map(prev);
+        next.delete(msg.teamId);
+        return next;
+      });
+      setOverrideTeam((prev) => (prev?.id === msg.teamId ? null : prev));
+    });
     ws.onConnState(setConnState);
     ws.connect();
 
@@ -210,6 +218,11 @@ export function AdminScreen({ session, onLogout }: { session: SessionData; onLog
           onClose={() => setOverrideTeam(null)}
           onAdjust={(deltaMs) => wsRef.current?.send({ type: "override_adjust", teamId: overrideTeam.id, deltaMs })}
           onForce={(status) => wsRef.current?.send({ type: "override_force", teamId: overrideTeam.id, status })}
+          onLogoutTeam={() => wsRef.current?.send({ type: "override_logout", teamId: overrideTeam.id })}
+          onRemove={() => {
+            wsRef.current?.send({ type: "override_remove", teamId: overrideTeam.id });
+            setOverrideTeam(null);
+          }}
         />
       )}
     </div>
@@ -222,12 +235,16 @@ function OverridePanel({
   onClose,
   onAdjust,
   onForce,
+  onLogoutTeam,
+  onRemove,
 }: {
   team: TeamPublic;
   token: string;
   onClose: () => void;
   onAdjust: (deltaMs: number) => void;
   onForce: (status: "IN" | "OUT") => void;
+  onLogoutTeam: () => void;
+  onRemove: () => void;
 }) {
   const [newCode, setNewCode] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -241,6 +258,12 @@ function OverridePanel({
       setNewCode("error");
     } finally {
       setBusy(false);
+    }
+  }
+
+  function doRemove() {
+    if (confirm(`Remove ${team.name}? Their code stops working immediately and this can't be undone.`)) {
+      onRemove();
     }
   }
 
@@ -264,6 +287,14 @@ function OverridePanel({
             Reissue code
           </button>
           {newCode && <span class="new-code">{newCode}</span>}
+        </div>
+        <div class="modal-row">
+          <button onClick={onLogoutTeam}>Log out team's devices</button>
+        </div>
+        <div class="modal-row">
+          <button class="danger-btn" onClick={doRemove}>
+            Remove team
+          </button>
         </div>
         <button class="link-btn" onClick={onClose}>
           Close

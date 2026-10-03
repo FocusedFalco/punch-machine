@@ -399,6 +399,12 @@ h2 {
   flex: 1;
   min-width: 100px;
 }
+.danger-btn {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: var(--red) !important;
+  color: var(--red) !important;
+  font-weight: 600;
+}
 .new-code {
   font-weight: 700;
   letter-spacing: 0.05em;

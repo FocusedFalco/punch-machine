@@ -36,6 +36,10 @@ export function TeamScreen({ session, onLogout }: { session: SessionData; onLogo
     ws.on("request_ack", () => {
       // server confirmed; optimistic state stays until admin decides
     });
+    ws.on("kicked", (msg) => {
+      setToast(msg.reason === "removed" ? "Your team was removed by an admin" : "You were logged out by an admin");
+      setTimeout(onLogout, 2000);
+    });
     ws.onConnState(setConnState);
     ws.connect();
 

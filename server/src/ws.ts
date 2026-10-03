@@ -276,6 +276,39 @@ export class Hub {
       });
       return;
     }
+
+    // Force-logout: every device currently using this team's code gets kicked
+    // back to the login screen, but the code itself keeps working -- they can
+    // log straight back in. The explicit "kicked" message goes out over the
+    // still-open sockets BEFORE the sessions are deleted and the sockets
+    // closed, so a connected client gets a clean signal instead of just
+    // silently failing its next reconnect attempt.
+    if (msg.type === "override_logout") {
+      const { teamId } = msg as { teamId: string };
+      const team = this.store.teams.get(teamId);
+      if (!team) return;
+      this.broadcastTeam(teamId, { type: "kicked", reason: "logged_out" });
+      this.store.logoutTeam(teamId);
+      for (const c of this.allConnsForTeam(teamId)) c.ws.close(4001, "logged out");
+      this.store.addAudit({ ts: Date.now(), type: "admin_logout_team", teamId, detail: "{}", actor });
+      return;
+    }
+
+    // Remove: the team is deleted outright. Their code stops working, they
+    // disappear from every admin's grid, and any connected device gets
+    // kicked. Unlike logout, this can't be undone without reseeding them as
+    // a brand new team (new id, new code).
+    if (msg.type === "override_remove") {
+      const { teamId } = msg as { teamId: string };
+      const team = this.store.teams.get(teamId);
+      if (!team) return;
+      this.broadcastTeam(teamId, { type: "kicked", reason: "removed" });
+      for (const c of this.allConnsForTeam(teamId)) c.ws.close(4002, "removed");
+      this.store.removeTeam(teamId);
+      this.broadcastAdmins({ type: "team_removed", teamId });
+      this.store.addAudit({ ts: Date.now(), type: "admin_remove_team", teamId, detail: "{}", actor });
+      return;
+    }
   }
 
   broadcastTeamExternal(team: Team) {

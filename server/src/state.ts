@@ -116,12 +116,31 @@ export class Store {
     team.codeHash = newCodeHash;
     this.teamsByCodeHash.set(newCodeHash, teamId);
     this.persist(`UPDATE teams SET code_hash=$1 WHERE id=$2`, [newCodeHash, teamId]);
+    this.logoutTeam(teamId);
+  }
 
-    // Invalidate every existing session for this team immediately.
+  /** Invalidates every existing session for a team. The team and its code are untouched --
+   * they can log straight back in with the same code. */
+  logoutTeam(teamId: string) {
     for (const [token, s] of this.sessions) {
       if (s.teamId === teamId) this.sessions.delete(token);
     }
     this.persist(`DELETE FROM sessions WHERE team_id=$1`, [teamId]);
+  }
+
+  /** Deletes a team outright: its code stops working, every session and pending
+   * request for it is gone. Irreversible short of reseeding as a new team. */
+  removeTeam(teamId: string) {
+    const team = this.teams.get(teamId);
+    if (!team) return;
+    this.teams.delete(teamId);
+    this.teamsByCodeHash.delete(team.codeHash);
+    for (const [id, r] of this.requests) {
+      if (r.teamId === teamId) this.requests.delete(id);
+    }
+    this.logoutTeam(teamId);
+    this.persist(`DELETE FROM requests WHERE team_id=$1`, [teamId]);
+    this.persist(`DELETE FROM teams WHERE id=$1`, [teamId]);
   }
 
   insertSession(session: Session) {
