@@ -168,7 +168,7 @@ export function LoginScreen({ onLogin }: { onLogin: (s: SessionData) => void }) 
             class="code-input-v2"
             placeholder={mode === "team" ? "XXXX-XXXX" : "Admin code"}
             value={code}
-            maxLength={mode === "team" ? 9 : undefined}
+            maxLength={mode === "team" ? 9 : 64}
             autofocus
             type="text"
             inputMode="text"
