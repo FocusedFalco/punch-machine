@@ -15,6 +15,7 @@ export interface AppConfig {
   hmacSecret: string;
   totalOutMs: number;
   port: number;
+  clientOrigin?: string;
   clientDist?: string;
 }
 
@@ -22,7 +23,12 @@ export function buildApp(store: Store, config: AppConfig) {
   const app = Fastify({ logger: false });
   const hub = new Hub(store);
 
-  app.register(cors, { origin: true });
+  // The frontend (Vercel) and this backend (Render) are different origins, so
+  // CORS has to be explicit. No cookies are used anywhere (auth is a bearer
+  // token / query param), so a permissive origin here doesn't expose
+  // anything a stolen token wouldn't already -- but set CLIENT_ORIGIN in
+  // production to pin it to your actual Vercel URL anyway.
+  app.register(cors, { origin: config.clientOrigin ?? true });
 
   // Rate-limit only FAILED login attempts per IP (generous: 20/min), since many
   // attendees share one venue NAT IP and successful logins must never be throttled.
@@ -108,7 +114,7 @@ export function buildApp(store: Store, config: AppConfig) {
   app.get("/api/admin/audit.csv", async (req, reply) => {
     const session = authAdmin(req, store);
     if (!session) return reply.code(401).send({ error: "unauthorized" });
-    const rows = store.getAllAuditLog();
+    const rows = await store.getAllAuditLog();
     const header = "id,ts,iso_time,type,team_id,team_name,actor,detail\n";
     const lines = rows.map((r) => {
       const team = r.teamId ? store.teams.get(r.teamId) : undefined;
@@ -124,7 +130,7 @@ export function buildApp(store: Store, config: AppConfig) {
   app.get("/api/admin/audit", async (req, reply) => {
     const session = authAdmin(req, store);
     if (!session) return reply.code(401).send({ error: "unauthorized" });
-    return { entries: store.getAuditLog(2000) };
+    return { entries: await store.getAuditLog(2000) };
   });
 
   app.get("/api/health", async () => ({ ok: true, now: Date.now() }));

@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: outtime-backend
+    runtime: node
+    region: singapore # closest Render region to ap-south-1; pick what's nearest your venue
+    plan: starter
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: ADMIN_CODE
+        sync: false
+      - key: HMAC_SECRET
+        sync: false
+      - key: TOTAL_OUT_MS
+        value: "25200000"
+      - key: DATABASE_URL
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false

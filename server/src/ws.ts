@@ -90,7 +90,7 @@ export class Hub {
     if (conn.session.role === "team" && conn.session.teamId) {
       const team = this.store.teams.get(conn.session.teamId);
       if (!team) return;
-      const pendingReq = Array.from(this.store.requests.values()).find((r) => r.teamId === team.id);
+      const pendingReq = this.store.findPendingForTeam(team.id);
       this.send(conn, {
         type: "snapshot",
         now,
@@ -100,7 +100,7 @@ export class Hub {
       });
     } else if (conn.session.role === "admin") {
       const teams = Array.from(this.store.teams.values()).map((t) => toPublicTeam(t, this.store.getTotalOutMs()));
-      const requests = Array.from(this.store.requests.values()).map((r) => this.decorateRequest(r));
+      const requests = this.store.getPendingRequests().map((r) => this.decorateRequest(r));
       this.send(conn, { type: "snapshot", now, totalOutMs: this.store.getTotalOutMs(), teams, requests });
     }
   }
@@ -191,7 +191,7 @@ export class Hub {
     if (msg.type === "decide") {
       const { requestId, action } = msg as { requestId: string; action: "accept" | "reject" };
       const req = this.store.requests.get(requestId);
-      if (!req) {
+      if (!req || req.status !== "pending") {
         // Already handled by someone else, or unknown.
         this.send(conn, { type: "already_handled", requestId, by: "another admin" });
         return;
@@ -212,8 +212,13 @@ export class Hub {
         return;
       }
 
-      // Atomic win: delete-from-map is the single decision point (single-threaded JS).
-      this.store.resolveRequest(requestId, action === "accept" ? "accepted" : "rejected", actor, now);
+      // Atomic win: resolveRequest only succeeds if still 'pending' right now -- the
+      // single decision point, safe because nothing above this line awaited anything.
+      const claimed = this.store.resolveRequest(requestId, action === "accept" ? "accepted" : "rejected", actor, now);
+      if (!claimed) {
+        this.send(conn, { type: "already_handled", requestId, by: "another admin" });
+        return;
+      }
       this.commitTeam(updatedTeam);
 
       this.broadcastAdmins({ type: "request_resolved", requestId, status: action, by: actor, teamId: team.id });

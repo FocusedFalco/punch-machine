@@ -1,4 +1,10 @@
-const API_BASE = ""; // same-origin; Vite dev proxy forwards /api to the server
+// The backend (Render) is a different origin than this frontend (Vercel), so
+// every call needs an absolute base URL -- set at build time via Vite env.
+const API_BASE = import.meta.env.VITE_API_BASE as string;
+
+if (!API_BASE) {
+  console.error("VITE_API_BASE is not set -- point it at your Render backend's URL.");
+}
 
 export async function teamLogin(code: string): Promise<{ token: string; teamId: string; teamName: string }> {
   const res = await fetch(`${API_BASE}/api/login`, {
@@ -35,6 +41,6 @@ export function auditCsvUrl(token: string) {
 }
 
 export function wsUrl(token: string) {
-  const proto = location.protocol === "https:" ? "wss" : "ws";
-  return `${proto}://${location.host}/ws?token=${encodeURIComponent(token)}`;
+  const wsBase = API_BASE.replace(/^http/, "ws");
+  return `${wsBase}/ws?token=${encodeURIComponent(token)}`;
 }
