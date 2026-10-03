@@ -1,13 +1,19 @@
 :root {
-  --bg: #0f1420;
-  --panel: #171e2e;
-  --panel-2: #1f2838;
-  --text: #e8ecf4;
-  --muted: #8b95a8;
-  --accent: #3b82f6;
-  --green: #22c55e;
-  --red: #ef4444;
-  --amber: #f59e0b;
+  --bg: #1a1714;
+  --panel: #242019;
+  --panel-2: #302a20;
+  --text: #f3ece0;
+  --muted: #a89a86;
+  --accent: #e8613e;
+  --accent-2: #f2805f;
+  --green: #7c8f5e;
+  --green-soft: rgba(124, 143, 94, 0.18);
+  --red: #d9594b;
+  --red-soft: rgba(217, 89, 75, 0.18);
+  --amber: #e3a23f;
+  --amber-soft: rgba(227, 162, 63, 0.18);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
   color-scheme: dark;
 }
 
@@ -65,32 +71,37 @@ input {
 .login-screen {
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
 }
 .brand {
-  font-size: 2.2rem;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 2.4rem;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 .mode-toggle {
   display: flex;
   gap: 8px;
   background: var(--panel);
-  border-radius: 10px;
+  border-radius: 999px;
   padding: 4px;
+  box-shadow: var(--shadow);
 }
 .mode-toggle button {
   border: none;
   background: transparent;
   color: var(--muted);
-  padding: 8px 20px;
+  padding: 8px 22px;
   min-height: 44px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 1rem;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 .mode-toggle button.active {
   background: var(--accent);
-  color: white;
+  color: #1a1714;
+  font-weight: 600;
 }
 .login-form {
   display: flex;
@@ -105,8 +116,8 @@ input {
   text-align: center;
   padding: 14px;
   min-height: 52px;
-  border-radius: 10px;
-  border: 1px solid #2a3348;
+  border-radius: 20px;
+  border: 1px solid #3a3225;
   background: var(--panel);
   color: var(--text);
   letter-spacing: 0.08em;
@@ -119,11 +130,12 @@ input {
   font-size: 1.1rem;
   padding: 14px;
   min-height: 52px;
-  border-radius: 10px;
+  border-radius: 999px;
   border: none;
   background: var(--accent);
-  color: white;
-  font-weight: 600;
+  color: #1a1714;
+  font-weight: 700;
+  box-shadow: var(--shadow);
 }
 .primary-btn:disabled {
   opacity: 0.6;
@@ -138,30 +150,36 @@ input {
 .top-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+  background: var(--panel);
+  border-radius: 999px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow);
 }
 .team-name {
+  font-family: var(--font-display);
   font-weight: 600;
+  font-size: 1.05rem;
   flex: 1;
 }
 .conn-badge {
   font-size: 0.75rem;
   color: var(--amber);
-  background: rgba(245, 158, 11, 0.15);
-  padding: 4px 8px;
-  border-radius: 6px;
+  background: var(--amber-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 .link-btn {
-  background: none;
-  border: 1px solid #2a3348;
+  background: var(--panel-2);
+  border: none;
   color: var(--muted);
-  padding: 6px 12px;
+  padding: 6px 14px;
   min-height: 40px;
   display: inline-flex;
   align-items: center;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 0.85rem;
   text-decoration: none;
 }
@@ -184,21 +202,22 @@ input {
   color: var(--red);
 }
 .status-label {
+  font-family: var(--font-display);
   color: var(--muted);
-  font-size: 1rem;
+  font-size: 1.05rem;
   margin-bottom: 20px;
 }
 .banner {
   width: 100%;
   max-width: 400px;
   text-align: center;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 20px;
   margin-bottom: 16px;
   font-size: 0.95rem;
 }
 .pending-banner {
-  background: rgba(245, 158, 11, 0.15);
+  background: var(--amber-soft);
   color: var(--amber);
 }
 .toast-banner {
@@ -217,19 +236,23 @@ input {
   height: clamp(170px, 50vw, 220px);
   border-radius: 50%;
   border: none;
+  font-family: var(--font-display);
   font-size: 1.6rem;
-  font-weight: 700;
-  color: white;
+  font-weight: 600;
+  color: #1a1714;
   transition: transform 0.1s ease;
+  box-shadow: var(--shadow);
 }
 .action-btn:active:not(:disabled) {
   transform: scale(0.96);
 }
 .action-btn.go-out {
   background: var(--red);
+  color: #2a1510;
 }
 .action-btn.enter {
   background: var(--green);
+  color: #16200f;
 }
 .action-btn:disabled {
   opacity: 0.5;
@@ -237,7 +260,7 @@ input {
 .exhausted-box {
   padding: 20px 30px;
   background: var(--panel-2);
-  border-radius: 12px;
+  border-radius: 20px;
   color: var(--amber);
   font-weight: 600;
   text-align: center;
@@ -252,19 +275,19 @@ input {
   align-items: stretch;
 }
 .alert-box {
-  background: rgba(239, 68, 68, 0.15);
+  background: var(--red-soft);
   color: var(--red);
-  padding: 10px 14px;
-  border-radius: 10px;
+  padding: 12px 16px;
+  border-radius: 18px;
   margin-bottom: 16px;
   font-weight: 600;
 }
 h2 {
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 20px 0 10px;
+  margin: 22px 0 10px;
 }
 .empty {
   color: var(--muted);
@@ -273,24 +296,29 @@ h2 {
 .queue-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 .queue-item {
   display: flex;
   flex-direction: column;
   background: var(--panel);
-  padding: 14px 16px;
-  border-radius: 10px;
+  padding: 16px;
+  border-radius: 20px;
   gap: 10px;
+  box-shadow: var(--shadow);
 }
 .queue-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
+.queue-info strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
 .req-type {
   font-size: 0.85rem;
-  color: var(--accent);
+  color: var(--accent-2);
 }
 .req-wait {
   font-size: 0.75rem;
@@ -307,9 +335,8 @@ h2 {
   min-height: 48px;
   flex: 1;
   font-size: 1rem;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 600;
-  color: white;
   transition: transform 0.1s ease;
 }
 .accept-btn:active,
@@ -318,40 +345,46 @@ h2 {
 }
 .accept-btn {
   background: var(--green);
+  color: #16200f;
 }
 .reject-btn {
   background: var(--red);
+  color: #2a1510;
 }
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 .team-card {
   background: var(--panel);
-  border-radius: 10px;
-  padding: 12px;
+  border-radius: 20px;
+  padding: 14px;
   min-height: 44px;
   border: 1px solid transparent;
+  box-shadow: var(--shadow);
   transition: transform 0.1s ease;
 }
 .team-card:active {
   transform: scale(0.97);
 }
 .team-card-name {
+  font-family: var(--font-display);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   margin-bottom: 4px;
 }
 .team-card-status {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--muted);
-  text-transform: capitalize;
-  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
 }
 .team-card-time {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
+  font-size: 1.05rem;
 }
 .team-card-time.overtime {
   color: var(--red);
@@ -376,13 +409,19 @@ h2 {
 }
 .modal {
   background: var(--panel);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 28px;
+  padding: 22px;
   width: 100%;
   max-width: 360px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-shadow: var(--shadow);
+}
+.modal h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
 }
 .modal-row {
   display: flex;
@@ -391,17 +430,16 @@ h2 {
 }
 .modal-row button {
   background: var(--panel-2);
-  border: 1px solid #2a3348;
+  border: none;
   color: var(--text);
   padding: 8px 12px;
   min-height: 44px;
-  border-radius: 8px;
+  border-radius: 16px;
   flex: 1;
   min-width: 100px;
 }
 .danger-btn {
-  background: rgba(239, 68, 68, 0.15) !important;
-  border-color: var(--red) !important;
+  background: var(--red-soft) !important;
   color: var(--red) !important;
   font-weight: 600;
 }

@@ -12,8 +12,8 @@ export default defineConfig({
         name: "OutTime",
         short_name: "OutTime",
         description: "Hackathon out-time punch tracker",
-        theme_color: "#111827",
-        background_color: "#111827",
+        theme_color: "#1A1714",
+        background_color: "#1A1714",
         display: "standalone",
         start_url: "/",
         icons: [
