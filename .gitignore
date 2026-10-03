@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.db
+*.db-wal
+*.db-shm
+.env
+coverage/
+client/dist/
+.claude/settings.local.json
+
