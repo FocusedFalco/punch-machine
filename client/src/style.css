@@ -112,18 +112,6 @@ input {
   font-weight: 600;
   font-size: 1.5rem;
 }
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background: var(--panel-2);
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
 .hero-card {
   background: var(--green);
   color: #f3f5ee;
@@ -157,21 +145,7 @@ input {
   font-size: 0.92rem;
   opacity: 0.85;
   line-height: 1.45;
-  margin: 14px 0 18px;
-}
-.hero-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  opacity: 0.9;
-}
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #f3f5ee;
+  margin: 14px 0 0;
 }
 
 .portal-select-row {

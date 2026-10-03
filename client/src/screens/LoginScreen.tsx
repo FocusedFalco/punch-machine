@@ -11,14 +11,6 @@ function ClockIcon() {
     </svg>
   );
 }
-function BellIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-  );
-}
 function BriefcaseIcon() {
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
@@ -104,9 +96,6 @@ export function LoginScreen({ onLogin }: { onLogin: (s: SessionData) => void }) 
             <span class="welcome-title">OutTime</span>
           </div>
         </div>
-        <div class="icon-btn" aria-hidden="true">
-          <BellIcon />
-        </div>
       </div>
 
       <div class="hero-card">
@@ -123,9 +112,6 @@ export function LoginScreen({ onLogin }: { onLogin: (s: SessionData) => void }) 
         <p class="hero-body">
           Enter your team's access code to go out, come back, and keep everyone's hours straight.
         </p>
-        <div class="hero-status">
-          <span class="status-dot" /> Live · real-time sync
-        </div>
       </div>
 
       <div class="portal-select-row">
