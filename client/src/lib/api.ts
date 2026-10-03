@@ -36,10 +36,6 @@ export async function reissueCode(token: string, teamId: string): Promise<{ code
   return res.json();
 }
 
-export function auditCsvUrl(token: string) {
-  return `${API_BASE}/api/admin/audit.csv?token=${encodeURIComponent(token)}`;
-}
-
 export function wsUrl(token: string) {
   const wsBase = API_BASE.replace(/^http/, "ws");
   return `${wsBase}/ws?token=${encodeURIComponent(token)}`;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { WsClient } from "../lib/wsclient";
-import { auditCsvUrl, reissueCode, wsUrl } from "../lib/api";
+import { reissueCode, wsUrl } from "../lib/api";
 import { clock } from "../lib/clock";
 import { formatAgo, formatDuration } from "../lib/format";
 import type { RequestView, TeamPublic } from "../types";
@@ -143,9 +143,6 @@ export function AdminScreen({ session, onLogout }: { session: SessionData; onLog
         <button class="link-btn" onClick={() => setMuted((m) => !m)}>
           {muted ? "🔇 unmute" : "🔊 mute"}
         </button>
-        <a class="link-btn" href={auditCsvUrl(session.token)} target="_blank" rel="noreferrer">
-          export CSV
-        </a>
         <button class="link-btn" onClick={onLogout}>
           logout
         </button>

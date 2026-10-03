@@ -195,24 +195,4 @@ export class Store {
     ]);
   }
 
-  async getAuditLog(limit = 1000): Promise<AuditEntry[]> {
-    const res = await this.db.query(`SELECT * FROM audit_log ORDER BY id DESC LIMIT $1`, [limit]);
-    return res.rows.map(mapAuditRow);
-  }
-
-  async getAllAuditLog(): Promise<AuditEntry[]> {
-    const res = await this.db.query(`SELECT * FROM audit_log ORDER BY id ASC`);
-    return res.rows.map(mapAuditRow);
-  }
-}
-
-function mapAuditRow(r: any): AuditEntry {
-  return {
-    id: Number(r.id),
-    ts: Number(r.ts),
-    type: r.type,
-    teamId: r.team_id,
-    detail: r.detail,
-    actor: r.actor,
-  };
 }

@@ -110,28 +110,6 @@ export function buildApp(store: Store, config: AppConfig) {
     return { code: formatCode(newRaw) };
   });
 
-  // ---- Admin: audit log CSV export ----
-  app.get("/api/admin/audit.csv", async (req, reply) => {
-    const session = authAdmin(req, store);
-    if (!session) return reply.code(401).send({ error: "unauthorized" });
-    const rows = await store.getAllAuditLog();
-    const header = "id,ts,iso_time,type,team_id,team_name,actor,detail\n";
-    const lines = rows.map((r) => {
-      const team = r.teamId ? store.teams.get(r.teamId) : undefined;
-      const iso = new Date(r.ts).toISOString();
-      const detail = (r.detail ?? "").replace(/"/g, '""');
-      return `${r.id},${r.ts},${iso},${r.type},${r.teamId ?? ""},"${team?.name ?? ""}","${r.actor ?? ""}","${detail}"`;
-    });
-    reply.header("Content-Type", "text/csv");
-    reply.header("Content-Disposition", "attachment; filename=audit_log.csv");
-    return header + lines.join("\n") + "\n";
-  });
-
-  app.get("/api/admin/audit", async (req, reply) => {
-    const session = authAdmin(req, store);
-    if (!session) return reply.code(401).send({ error: "unauthorized" });
-    return { entries: await store.getAuditLog(2000) };
-  });
 
   app.get("/api/health", async () => ({ ok: true, now: Date.now() }));
 
