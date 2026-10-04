@@ -253,7 +253,6 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   font-size: 1.1rem;
   padding: 14px;
   min-height: 56px;
@@ -267,9 +266,6 @@ input {
 }
 .enter-btn-v2:disabled {
   opacity: 0.6;
-}
-.enter-btn-v2 .arrow {
-  font-size: 1.1rem;
 }
 .error-text {
   color: var(--red);
