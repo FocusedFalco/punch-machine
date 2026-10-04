@@ -36,6 +36,7 @@ export function TeamScreen({ session, onLogout }: { session: SessionData; onLogo
   const [connState, setConnState] = useState<"connecting" | "open" | "closed">("connecting");
   const [now, setNow] = useState(() => clock.now());
   const [toast, setToast] = useState<string | null>(null);
+  const [stuck, setStuck] = useState(false);
   const wsRef = useRef<WsClient | null>(null);
   const pendingClientReqId = useRef<string | null>(null);
 
@@ -73,10 +74,24 @@ export function TeamScreen({ session, onLogout }: { session: SessionData; onLogo
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    if (team) return;
+    const id = setTimeout(() => setStuck(true), 8000);
+    return () => clearTimeout(id);
+  }, [team]);
+
   if (!team) {
     return (
       <div class="screen team-screen-v2">
         <div class="loading">Loading…</div>
+        {stuck && (
+          <div class="loading-stuck">
+            <p>Taking longer than usual to connect.</p>
+            <button class="link-btn" onClick={onLogout}>
+              <ExitIcon />Back to login
+            </button>
+          </div>
+        )}
       </div>
     );
   }
