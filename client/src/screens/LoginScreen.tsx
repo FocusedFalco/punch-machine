@@ -191,9 +191,13 @@ export function LoginScreen({ onLogin }: { onLogin: (s: SessionData) => void }) 
         {error && <div class="error-text">{error}</div>}
 
         <button class="enter-btn-v2" type="submit" disabled={busy}>
-          {busy ? "..." : (
+          {busy ? (
+            "..."
+          ) : (
             <>
-              Enter<span class="arrow">→</span>
+              <span class="enter-btn-spacer" aria-hidden="true" />
+              <span class="enter-btn-label">Enter</span>
+              <span class="arrow">→</span>
             </>
           )}
         </button>
