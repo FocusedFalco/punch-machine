@@ -240,10 +240,10 @@ input {
   justify-content: center;
 }
 .name-input {
-  font-size: 1rem;
+  font-size: 1.3rem;
   text-align: center;
   padding: 14px;
-  min-height: 52px;
+  min-height: 56px;
   border-radius: 20px;
   border: 1px solid #3a3225;
   background: var(--panel);
