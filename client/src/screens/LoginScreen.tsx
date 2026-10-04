@@ -195,8 +195,7 @@ export function LoginScreen({ onLogin }: { onLogin: (s: SessionData) => void }) 
             "..."
           ) : (
             <>
-              <span class="enter-btn-spacer" aria-hidden="true" />
-              <span class="enter-btn-label">Enter</span>
+              <span>Enter</span>
               <span class="arrow">→</span>
             </>
           )}
