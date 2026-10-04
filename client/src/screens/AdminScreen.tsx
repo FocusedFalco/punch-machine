@@ -219,7 +219,7 @@ export function AdminScreen({ session, onLogout }: { session: SessionData; onLog
           {muted ? "🔇 unmute" : "🔊 mute"}
         </button>
         <button class="link-btn" onClick={onLogout}>
-          <ExitIcon /> Exit
+          <ExitIcon />Exit
         </button>
       </div>
 
@@ -297,10 +297,10 @@ export function AdminScreen({ session, onLogout }: { session: SessionData; onLog
               </div>
               <div class="hero-actions">
                 <button class="hero-accept-btn" onClick={() => decide(featured.id, "accept")}>
-                  <CheckIcon /> Accept
+                  <CheckIcon />Accept
                 </button>
                 <button class="hero-reject-btn" onClick={() => decide(featured.id, "reject")}>
-                  <XIcon /> Reject
+                  <XIcon />Reject
                 </button>
               </div>
             </div>

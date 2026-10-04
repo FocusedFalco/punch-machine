@@ -118,7 +118,7 @@ export function TeamScreen({ session, onLogout }: { session: SessionData; onLogo
           </div>
         </div>
         <button class="link-btn" onClick={onLogout}>
-          <ExitIcon /> Exit
+          <ExitIcon />Exit
         </button>
       </div>
 
