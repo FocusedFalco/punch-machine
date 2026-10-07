@@ -24,7 +24,7 @@ if (!inputPath) {
   process.exit(1);
 }
 const outputPath = process.argv[3] ?? inputPath.replace(/\.csv$/i, "") + "_with_codes.csv";
-const TOTAL_OUT_MS = Number(process.env.TOTAL_OUT_MS ?? 7 * 3600 * 1000);
+const TOTAL_OUT_MS = Number(process.env.TOTAL_OUT_MS ?? 6 * 3600 * 1000);
 
 const raw = fs.readFileSync(inputPath, "utf-8");
 const lines = raw
