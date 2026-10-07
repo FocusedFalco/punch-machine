@@ -6,7 +6,6 @@ export type RequestStatus = "pending" | "accepted" | "rejected";
 export interface Team {
   id: string;
   name: string;
-  leaderEmail: string;
   codeHash: string;
   status: TeamStatus;
   remainingMsAtLastStop: number;

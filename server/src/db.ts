@@ -14,7 +14,6 @@ const SCHEMA = `
   CREATE TABLE IF NOT EXISTS teams (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    leader_email TEXT NOT NULL,
     code_hash TEXT NOT NULL UNIQUE,
     status TEXT NOT NULL,
     remaining_ms_at_last_stop BIGINT NOT NULL,
@@ -66,5 +65,6 @@ export async function openDb(connectionString: string): Promise<DB> {
     ssl: connectionString.includes("localhost") ? false : { rejectUnauthorized: false },
   });
   await pool.query(SCHEMA);
+  await pool.query(`ALTER TABLE teams DROP COLUMN IF EXISTS leader_email`);
   return pool;
 }

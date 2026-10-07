@@ -172,13 +172,13 @@ the Vite app from there, no custom build config needed). Set one env var:
 ### Seeding teams
 
 ```bash
-# teams.csv: team_name,leader_email (header row optional)
+# teams.csv: team_name (header row optional)
 cd server
 HMAC_SECRET=<prod-secret> DATABASE_URL=<your-session-pooler-url> \
   npm run seed -- teams.csv teams_with_codes.csv
 ```
 
-Writes `teams_with_codes.csv` (`team_name,leader_email,access_code`) — the only place the
+Writes `teams_with_codes.csv` (`team_name,access_code`) — the only place the
 plaintext codes ever exist. Distribute it to team leads and then delete it. The database
 only ever stores an HMAC-SHA256 hash of each code (keyed by `HMAC_SECRET`); codes are 8
 characters from `23456789ABCDEFGHJKMNPQRSTUVWXYZ` (no `0/O/1/I/L`), shown as `XXXX-XXXX`,

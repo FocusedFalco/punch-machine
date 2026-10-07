@@ -4,8 +4,8 @@ import { openDb } from "./db.js";
 import { generateCode, formatCode, hashCode } from "./auth.js";
 
 // Usage: npm run seed -- teams.csv [output.csv]
-// Input CSV: team_name,leader_email (header row optional)
-// Output CSV: team_name,leader_email,access_code
+// Input CSV: team_name (header row optional, one name per line also works)
+// Output CSV: team_name,access_code
 
 const HMAC_SECRET = process.env.HMAC_SECRET;
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -39,11 +39,11 @@ if (rows[0] && rows[0][0]?.toLowerCase().includes("team")) {
 
 const db = await openDb(DATABASE_URL);
 
-const out: string[] = ["team_name,leader_email,access_code"];
+const out: string[] = ["team_name,access_code"];
 const seen = new Set<string>();
 let count = 0;
 
-for (const [name, email] of rows) {
+for (const [name] of rows) {
   if (!name) continue;
   let rawCode: string;
   let hash: string;
@@ -55,11 +55,11 @@ for (const [name, email] of rows) {
 
   const now = Date.now();
   await db.query(
-    `INSERT INTO teams (id, name, leader_email, code_hash, status, remaining_ms_at_last_stop, running_since, created_at, updated_at)
-     VALUES ($1,$2,$3,$4,'IN',$5,NULL,$6,$6)`,
-    [crypto.randomUUID(), name, email ?? "", hash, TOTAL_OUT_MS, now]
+    `INSERT INTO teams (id, name, code_hash, status, remaining_ms_at_last_stop, running_since, created_at, updated_at)
+     VALUES ($1,$2,$3,'IN',$4,NULL,$5,$5)`,
+    [crypto.randomUUID(), name, hash, TOTAL_OUT_MS, now]
   );
-  out.push(`${name},${email ?? ""},${formatCode(rawCode)}`);
+  out.push(`${name},${formatCode(rawCode)}`);
   count++;
 }
 

@@ -28,7 +28,6 @@ export class Store {
       const team: Team = {
         id: row.id,
         name: row.name,
-        leaderEmail: row.leader_email,
         codeHash: row.code_hash,
         status: row.status,
         remainingMsAtLastStop: Number(row.remaining_ms_at_last_stop),
@@ -93,12 +92,11 @@ export class Store {
     this.teams.set(team.id, team);
     this.teamsByCodeHash.set(team.codeHash, team.id);
     this.persist(
-      `INSERT INTO teams (id, name, leader_email, code_hash, status, remaining_ms_at_last_stop, running_since, created_at, updated_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+      `INSERT INTO teams (id, name, code_hash, status, remaining_ms_at_last_stop, running_since, created_at, updated_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
       [
         team.id,
         team.name,
-        team.leaderEmail,
         team.codeHash,
         team.status,
         team.remainingMsAtLastStop,
