@@ -6,7 +6,7 @@ import crypto from "node:crypto";
 import { WebSocketServer } from "ws";
 import type { Store } from "./state.js";
 import { Hub } from "./ws.js";
-import { generateCode, formatCode, hashCode, normalizeCodeInput, generateToken, RateLimiter } from "./auth.js";
+import { generateCode, formatCode, hashCode, normalizeCodeInput, generateToken, RateLimiter, safeEqual } from "./auth.js";
 import type { Session, Team } from "./types.js";
 import { toPublicTeam } from "./types.js";
 
@@ -28,6 +28,9 @@ export function buildApp(store: Store, config: AppConfig) {
   // token / query param), so a permissive origin here doesn't expose
   // anything a stolen token wouldn't already -- but set CLIENT_ORIGIN in
   // production to pin it to your actual Vercel URL anyway.
+  if (!config.clientOrigin) {
+    console.warn("[WARN] CLIENT_ORIGIN not set — CORS will allow any origin.");
+  }
   app.register(cors, { origin: config.clientOrigin ?? true });
 
   // Rate-limit only FAILED login attempts per IP (generous: 20/min), since many
@@ -46,7 +49,7 @@ export function buildApp(store: Store, config: AppConfig) {
       return reply.code(429).send({ error: "too many failed attempts, try again shortly" });
     }
     const body = req.body as { code?: string };
-    if (!body?.code) return reply.code(400).send({ error: "code required" });
+    if (!body?.code || body.code.length > 64) return reply.code(400).send({ error: "code required" });
     const normalized = normalizeCodeInput(body.code);
     const codeHash = hashCode(normalized, config.hmacSecret);
     const teamId = store.teamsByCodeHash.get(codeHash);
@@ -70,8 +73,10 @@ export function buildApp(store: Store, config: AppConfig) {
       return reply.code(429).send({ error: "too many failed attempts, try again shortly" });
     }
     const body = req.body as { code?: string; name?: string };
-    if (!body?.code || !body?.name) return reply.code(400).send({ error: "code and name required" });
-    if (body.code !== config.adminCode) {
+    if (!body?.code || !body?.name || body.code.length > 64 || body.name.length > 120) {
+      return reply.code(400).send({ error: "code and name required" });
+    }
+    if (!safeEqual(body.code, config.adminCode)) {
       failedLoginLimiter.recordFailure(ip);
       return reply.code(401).send({ error: "invalid code" });
     }

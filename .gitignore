@@ -7,4 +7,6 @@ dist/
 coverage/
 client/dist/
 .claude/settings.local.json
+*_with_codes.csv
+teams_with_codes.*
 

@@ -28,6 +28,14 @@ export function generateToken(): string {
   return crypto.randomBytes(32).toString("base64url");
 }
 
+/** Constant-time string comparison, so a wrong admin code can't be brute-forced via timing. */
+export function safeEqual(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
 /** Simple in-memory sliding-window rate limiter per key (IP). Only `recordFailure` consumes
  * a slot; `isBlocked` is a read-only check, so successful attempts are never throttled. */
 export class RateLimiter {
