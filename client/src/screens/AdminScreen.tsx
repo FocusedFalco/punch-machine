@@ -190,7 +190,11 @@ export function AdminScreen({ session, onLogout }: { session: SessionData; onLog
 
   function decide(requestId: string, action: "accept" | "reject") {
     stopFlash();
-    wsRef.current?.send({ type: "decide", requestId, action });
+    const ok = wsRef.current?.send({ type: "decide", requestId, action });
+    if (!ok) {
+      setToast("Not connected — reconnecting, try again in a moment");
+      setTimeout(() => setToast(null), 2500);
+    }
   }
 
   function remainingFor(t: TeamPublic) {
