@@ -14,7 +14,7 @@ services:
       - key: HMAC_SECRET
         sync: false
       - key: TOTAL_OUT_MS
-        value: "21600000"
+        value: "25200000"
       - key: DATABASE_URL
         sync: false
       - key: CLIENT_ORIGIN

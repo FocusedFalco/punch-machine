@@ -5,7 +5,7 @@ import { buildApp, attachWebSocketServer } from "./http.js";
 const PORT = Number(process.env.PORT ?? 8080);
 const ADMIN_CODE = process.env.ADMIN_CODE ?? "ADMIN-DEV";
 const HMAC_SECRET = process.env.HMAC_SECRET ?? "dev-secret-change-me";
-const TOTAL_OUT_MS = Number(process.env.TOTAL_OUT_MS ?? 6 * 3600 * 1000);
+const TOTAL_OUT_MS = Number(process.env.TOTAL_OUT_MS ?? 7 * 3600 * 1000);
 const DATABASE_URL = process.env.DATABASE_URL;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN; // e.g. https://outtime.vercel.app; unset = allow any origin
 const CLIENT_DIST = process.env.CLIENT_DIST ?? undefined; // only needed for a single-process deploy
