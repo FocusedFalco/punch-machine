@@ -197,7 +197,10 @@ export class Hub {
         return;
       }
       const team = this.store.teams.get(req.teamId);
-      if (!team) return;
+      if (!team) {
+        this.send(conn, { type: "error", requestId, message: "team no longer exists" });
+        return;
+      }
 
       const now = Date.now();
       let updatedTeam: Team;
@@ -208,18 +211,26 @@ export class Hub {
           updatedTeam = action === "accept" ? applyEnterAccept(team, now) : applyEnterReject(team);
         }
       } catch (err) {
-        this.send(conn, { type: "error", message: err instanceof Error ? err.message : "error" });
+        this.send(conn, { type: "error", requestId, message: err instanceof Error ? err.message : "error" });
         return;
       }
 
       // Atomic win: resolveRequest only succeeds if still 'pending' right now -- the
       // single decision point, safe because nothing above this line awaited anything.
-      const claimed = this.store.resolveRequest(requestId, action === "accept" ? "accepted" : "rejected", actor, now);
+      // It also persists the request-status and team-state writes together in one
+      // transaction, so a restart can't save one and lose the other.
+      const claimed = this.store.resolveRequest(
+        requestId,
+        action === "accept" ? "accepted" : "rejected",
+        actor,
+        now,
+        updatedTeam
+      );
       if (!claimed) {
         this.send(conn, { type: "already_handled", requestId, by: "another admin" });
         return;
       }
-      this.commitTeam(updatedTeam);
+      this.broadcastTeamUpdate(updatedTeam);
 
       this.broadcastAdmins({ type: "request_resolved", requestId, status: action, by: actor, teamId: team.id });
       this.broadcastTeam(team.id, {

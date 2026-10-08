@@ -158,6 +158,20 @@ export function AdminScreen({ session, onLogout }: { session: SessionData; onLog
         return next;
       });
     });
+    ws.on("error", (msg) => {
+      setToast(msg.message ?? "Error");
+      setTimeout(() => setToast(null), 3500);
+      // The server rejected this request outright (e.g. the team's state moved on
+      // some other way) -- drop it locally too, or it'd sit there looking "stuck"
+      // forever since nothing will ever resolve it.
+      if (msg.requestId) {
+        setRequests((prev) => {
+          const next = new Map(prev);
+          next.delete(msg.requestId);
+          return next;
+        });
+      }
+    });
     ws.on("team_removed", (msg) => {
       setTeams((prev) => {
         const next = new Map(prev);

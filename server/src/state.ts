@@ -13,6 +13,13 @@ export class Store {
   // by status themselves.
   requests = new Map<string, TeamRequest>();
   sessions = new Map<string, Session>();
+  // Every DB write touching a given team's row chains onto this, so two
+  // persists for the same team can never land on disk out of program order
+  // (e.g. a slower earlier write landing after a faster later one and
+  // silently reverting it -- this is what caused two teams to get stuck
+  // mid-event: the request-creation write and the accept-decision write
+  // raced, and whichever happened to finish last on the network won).
+  private teamWriteQueues = new Map<string, Promise<unknown>>();
 
   private constructor(private db: DB, private totalOutMs: number) {}
 
@@ -79,12 +86,31 @@ export class Store {
     });
   }
 
+  /** Queues `fn` behind every previously-queued write for this team, so
+   * writes to the same team's row are always applied in the order they
+   * were called, never in network-completion order. Still fire-and-forget
+   * from the caller's perspective (never awaited on the request path). */
+  private enqueueTeamWrite(teamId: string, fn: () => Promise<void>) {
+    const prev = this.teamWriteQueues.get(teamId) ?? Promise.resolve();
+    const next = prev.then(fn, fn).catch((err) => {
+      console.error("[persist] team write failed:", teamId, err);
+    });
+    this.teamWriteQueues.set(teamId, next);
+  }
+
   // ---- persistence ----
 
   persistTeam(team: Team) {
-    this.persist(
-      `UPDATE teams SET status=$1, remaining_ms_at_last_stop=$2, running_since=$3, updated_at=$4 WHERE id=$5`,
-      [team.status, team.remainingMsAtLastStop, team.runningSince, team.updatedAt, team.id]
+    this.enqueueTeamWrite(team.id, () =>
+      this.db
+        .query(`UPDATE teams SET status=$1, remaining_ms_at_last_stop=$2, running_since=$3, updated_at=$4 WHERE id=$5`, [
+          team.status,
+          team.remainingMsAtLastStop,
+          team.runningSince,
+          team.updatedAt,
+          team.id,
+        ])
+        .then(() => {})
     );
   }
 
@@ -166,21 +192,59 @@ export class Store {
    * one always observes the first's write. Returns the claimed request, or
    * undefined if someone else already resolved it (the caller's cue to
    * reply "already handled").
+   *
+   * The request-status write and the team-state write happen in a single
+   * DB transaction (not two independent fire-and-forget persists) because
+   * a process restart landing between two separate writes can save one and
+   * lose the other -- leaving a request permanently stuck "pending" against
+   * a team that already moved on, which a later accept/reject can never
+   * resolve (the state machine has no legal transition for it).
    */
-  resolveRequest(reqId: string, status: RequestStatus, resolvedBy: string, resolvedAt: number): TeamRequest | undefined {
+  resolveRequest(
+    reqId: string,
+    status: RequestStatus,
+    resolvedBy: string,
+    resolvedAt: number,
+    team: Team
+  ): TeamRequest | undefined {
     const req = this.requests.get(reqId);
     if (!req || req.status !== "pending") return undefined;
 
     req.status = status;
     req.resolvedAt = resolvedAt;
     req.resolvedBy = resolvedBy;
+    team.updatedAt = resolvedAt;
+    this.teams.set(team.id, team);
 
-    this.persist(`UPDATE requests SET status=$1, resolved_at=$2, resolved_by=$3 WHERE id=$4`, [
-      status,
-      resolvedAt,
-      resolvedBy,
-      reqId,
-    ]);
+    // Queued behind this team's other writes (see enqueueTeamWrite) so it can't
+    // land before or after an unrelated write out of turn, and run as a single
+    // connection's transaction (pool.query() alone would grab a different
+    // connection per call, which would not actually be transactional) so the
+    // request-status write and the team-state write both land or neither does.
+    this.enqueueTeamWrite(team.id, async () => {
+      const client = await this.db.connect();
+      try {
+        await client.query("BEGIN");
+        await client.query(`UPDATE requests SET status=$1, resolved_at=$2, resolved_by=$3 WHERE id=$4`, [
+          status,
+          resolvedAt,
+          resolvedBy,
+          reqId,
+        ]);
+        await client.query(
+          `UPDATE teams SET status=$1, remaining_ms_at_last_stop=$2, running_since=$3, updated_at=$4 WHERE id=$5`,
+          [team.status, team.remainingMsAtLastStop, team.runningSince, team.updatedAt, team.id]
+        );
+        await client.query("COMMIT");
+      } catch (err) {
+        console.error("[persist] resolveRequest transaction failed:", err);
+        await client.query("ROLLBACK").catch(() => {});
+        throw err;
+      } finally {
+        client.release();
+      }
+    });
+
     return req;
   }
 
