@@ -146,7 +146,7 @@ export function TeamScreen({ session, onLogout }: { session: SessionData; onLogo
         <div class="team-countdown-row">
           <div class="team-countdown-label">{overtime ? "Overtime" : "Remaining time"}</div>
           <div class="team-countdown-value">
-            {overtime && <span class="countdown-plus">+</span>}
+            {overtime && <span class="countdown-plus">-</span>}
             {hh}
             <span class="countdown-sep">:</span>
             {mm}

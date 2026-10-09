@@ -367,7 +367,7 @@ export function AdminScreen({ session, onLogout }: { session: SessionData; onLog
                   <div class="team-card-name">{t.name}</div>
                   <div class="team-card-status">{t.status.replace("_", " ")}</div>
                   <div class={`team-card-time ${overtime ? "overtime" : ""}`}>
-                    {overtime ? `+${formatDuration(-r)}` : formatDuration(r)}
+                    {overtime ? `-${formatDuration(-r)}` : formatDuration(r)}
                   </div>
                 </div>
               );
